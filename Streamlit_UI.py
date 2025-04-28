@@ -19,7 +19,7 @@ MODELS = {
 def load_model(model_path):
     try:
         model = joblib.load(model_path)
-        if not hasattr(model, 'estimators_'):  # AdaBoost 特有检查
+        if not hasattr(model, 'estimators_'): 
             raise ValueError("Model not trained！")
         return model
     except Exception as e:
