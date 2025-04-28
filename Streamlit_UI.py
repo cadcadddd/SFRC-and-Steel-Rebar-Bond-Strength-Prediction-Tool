@@ -3,19 +3,18 @@ import joblib
 import pandas as pd
 
 
-# 1. 预定义模型信息（模型文件路径 + 显示名称）
 MODELS = {
     "AdaBoost": "models/AdaBoost_model.pkl",
     "XGBoost": "models/XGBoost_model.pkl",
     "GBDT": "models/GBDT_model.pkl",
     "RF": "modelsmodels/RF_model.pkl",
-    "MLP": "models/MLP_model.pkl",  # 如果是Keras模型需特殊处理
+    "MLP": "models/MLP_model.pkl",  
     "SVR": "models/SVR_model.pkl",
     "KNN": "models/KNN_model.pkl",
     "KRR": "models/KRR_model.pkl"
 }
 
-# 2. 加载模型的函数（带缓存）
+
 @st.cache_resource
 def load_model(model_path):
     try:
@@ -28,11 +27,9 @@ def load_model(model_path):
         return None
 
 
-# 3. 主界面
 def main():
     st.title("🔮 Multi-Model Prediction System")
 
-    # ---- 侧边栏：模型选择 ----
     st.sidebar.header("Model Configuration")
     selected_model_name = st.sidebar.selectbox(
         "Select Prediction Model",
@@ -40,7 +37,6 @@ def main():
         help="Choose model based on task type"
     )
 
-    # ---- 主区域：数据上传和预测 ----
     st.header("1. Upload Data")
 
     st.markdown("""
@@ -58,28 +54,23 @@ def main():
         st.success("✅ Data loaded successfully！")
         st.write("Data Preview：", df.head(3))
 
-        # 显示当前选择的模型
         st.header("2. Model Information")
         model_path = MODELS[selected_model_name]
         st.code(f"Selected Model: {selected_model_name}\nPath: {model_path}")
 
-        # 加载模型并预测
         if st.button("🚀  Run Prediction", type="primary"):
             with st.spinner("Loading model..."):
                 try:
-                    # 关键点：直接加载预训练模型，不执行fit！
                     model = load_model(model_path)
                     st.success("Pre-trained model loaded successfully!")
 
-                    # 执行预测（根据模型类型适配）
-                    if "clf" in model_path.lower():  # 分类模型
+                    if "clf" in model_path.lower():  
                         predictions = model.predict(df)
                         st.write("Predicted Classes：", predictions)
                     else:  # 回归模型
                         predictions = model.predict(df)
                         st.write("Predicted Values：", predictions)
 
-                    # 下载结果
                     result_df = pd.DataFrame({"Predictions": predictions})
                     st.download_button("📥 Download Results",
                                        result_df.to_csv(),
